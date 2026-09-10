@@ -28,8 +28,9 @@ header.top{position:sticky;top:0;z-index:50;background:rgba(245,243,238,.94);
   backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .top-in{max-width:1280px;margin:0 auto;padding:13px 26px 0}
 .brandrow{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
-.mark{width:33px;height:33px;border-radius:8px;background:var(--accent);color:#fff;
-  display:grid;place-items:center;font-weight:700;font-size:15px}
+.mark{width:36px;height:36px;border-radius:7px;background:var(--accent);
+  display:grid;place-items:center;flex:0 0 auto}
+.mark svg{width:24px;height:23px;display:block}
 .brandrow h1{font-size:18px}
 .brandrow .sub{color:var(--muted);font-size:12.5px}
 .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;
@@ -263,7 +264,13 @@ footer{max-width:1280px;margin:0 auto;padding:0 26px 60px;color:var(--faint);fon
 <header class="top">
   <div class="top-in">
     <div class="brandrow">
-      <div class="mark">模</div>
+      <div class="mark" title="WINEX DERMA">
+        <svg viewBox="-4 -2 112 104" aria-label="WINEX">
+          <clipPath id="wclip"><rect x="-8" y="0" width="120" height="100"/></clipPath>
+          <path clip-path="url(#wclip)" d="M4.5,-14 L37,100 L52,40 L67,100 L99.5,-14"
+                fill="none" stroke="#fff" stroke-width="16" stroke-miterlimit="10"/>
+        </svg>
+      </div>
       <h1>區域獲利模組卡</h1>
       <span class="sub">海欣大中華 2027 · 方針三｜提案 A · v2 雙軌版</span>
       <span class="pill">示範資料 · 非核定數字</span>
@@ -285,6 +292,12 @@ footer{max-width:1280px;margin:0 auto;padding:0 26px 60px;color:var(--faint);fon
    模型引擎
    ══════════════════════════════════════════════ */
 function calcTW(p){
+  // 一位票券客的實際價值（年度）＝ 補給費 ＋ 現場加購毛利 ＋ 轉正後首年貢獻
+  const gm         = 1 - p.materialRate - p.bonusRate;              // 服務毛利率
+  const vUpValue   = p.upRate * p.upTicket * gm;                    // 現場加購毛利
+  const vConvValue = p.convRate * p.ownTicket * p.repeatPerYear * gm; // 轉正後首年貢獻
+  const vUnitValue = p.subsidy + vUpValue + vConvValue;             // 每位合計
+  const vFold      = vUnitValue / p.subsidy;                        // 是補給費的幾倍
   const ownRev   = p.ownVisits * p.ownTicket;
   const upRev    = p.vVisits * p.upRate * p.upTicket;
   const svcRev   = ownRev + upRev;
@@ -298,6 +311,8 @@ function calcTW(p){
   const cost     = p.rent + p.staff + bonus + material + p.mgmtFee + mkt + p.misc + dep;
   const profit   = rev - cost;
   return {ownRev,upRev,svcRev,subsidy,goodsRev,rev,bonus,material,mkt,dep,cost,profit,
+    gm,vUpValue,vConvValue,vUnitValue,vFold,
+    vYearValue: vUnitValue * p.vVisits * 12,
     margin: rev? profit/rev : 0,
     mgmtReturn: goodsRev + subsidy,
     mgmtNet: p.mgmtFee - (goodsRev + subsidy),
@@ -328,38 +343,38 @@ const TW = [
 {code:'T-N-01', name:'標準店 · 加盟 60', band:'北部票券帶', tier:'加盟 60', ping:25, hc:'店主 1 · 美療師 2',
  sample:9, cur:'NT$', vYear:180,
  invest:{'加盟金（一次性）':600000,'裝修工程':1200000,'設備儀器':500000,'首批貨品':250000,'開辦其他':150000,'保證金（待確認）':0},
- p:{ownVisits:145,ownTicket:3200,vVisits:15,upRate:.35,upTicket:1800,subsidy:300,
+ p:{ownVisits:145,ownTicket:3200,vVisits:15,upRate:.35,upTicket:1800,subsidy:300,convRate:.18,repeatPerYear:6,
     redeemValue:50000,sellRate:.60,rent:55000,staff:136000,bonusRate:.08,materialRate:.18,
     mgmtFee:25000,mktRate:.03,misc:22000,deco:1200000,equip:500000},
- v2:{ownVisits:138,ownTicket:3350,vVisits:13,upRate:.38,upTicket:1800,subsidy:300,
+ v2:{ownVisits:138,ownTicket:3350,vVisits:13,upRate:.38,upTicket:1800,subsidy:300,convRate:.18,repeatPerYear:6,
     redeemValue:50000,sellRate:.66,rent:59000,staff:136000,bonusRate:.08,materialRate:.172,
     mgmtFee:25000,mktRate:.03,misc:22000,deco:1200000,equip:500000}},
 
 {code:'T-N-02', name:'小型店 · 特許 48', band:'北部票券帶', tier:'特許 48', ping:15, hc:'店主 1 · 美療師 1',
  sample:12, cur:'NT$', vYear:120,
  invest:{'加盟金（一次性）':600000,'裝修工程':800000,'設備儀器':400000,'首批貨品':200000,'開辦其他':120000,'保證金（待確認）':0},
- p:{ownVisits:95,ownTicket:3000,vVisits:10,upRate:.35,upTicket:1800,subsidy:300,
+ p:{ownVisits:95,ownTicket:3000,vVisits:10,upRate:.35,upTicket:1800,subsidy:300,convRate:.18,repeatPerYear:6,
     redeemValue:50000,sellRate:.55,rent:38000,staff:92000,bonusRate:.08,materialRate:.18,
     mgmtFee:25000,mktRate:.03,misc:16000,deco:800000,equip:400000}},
 
 {code:'T-S-03', name:'標準店 · 加盟 60', band:'南部票券帶', tier:'加盟 60', ping:25, hc:'店主 1 · 美療師 2',
  sample:6, cur:'NT$', vYear:60, contrast:'T-N-01',
  invest:{'加盟金（一次性）':600000,'裝修工程':1000000,'設備儀器':450000,'首批貨品':250000,'開辦其他':130000,'保證金（待確認）':0},
- p:{ownVisits:130,ownTicket:2900,vVisits:5,upRate:.35,upTicket:1800,subsidy:300,
+ p:{ownVisits:130,ownTicket:2900,vVisits:5,upRate:.35,upTicket:1800,subsidy:300,convRate:.18,repeatPerYear:6,
     redeemValue:50000,sellRate:.60,rent:32000,staff:122000,bonusRate:.08,materialRate:.18,
     mgmtFee:25000,mktRate:.03,misc:18000,deco:1000000,equip:450000}},
 
 {code:'T-N-04', name:'擴編店 · 加盟 96', band:'北部票券帶', tier:'加盟 96', ping:35, hc:'店主 1 · 美療師 3',
  sample:4, cur:'NT$', vYear:300,
  invest:{'加盟金（一次性）':600000,'裝修工程':1700000,'設備儀器':700000,'首批貨品':350000,'開辦其他':200000,'保證金（待確認）':0},
- p:{ownVisits:205,ownTicket:3400,vVisits:25,upRate:.35,upTicket:2000,subsidy:300,
+ p:{ownVisits:205,ownTicket:3400,vVisits:25,upRate:.35,upTicket:2000,subsidy:300,convRate:.18,repeatPerYear:6,
     redeemValue:50000,sellRate:.68,rent:78000,staff:186000,bonusRate:.08,materialRate:.18,
     mgmtFee:25000,mktRate:.03,misc:30000,deco:1700000,equip:700000}},
 
 {code:'T-X-05', name:'首年新店 · 試婚約 66', band:'北部票券帶', tier:'試婚約 66', ping:20, hc:'店主 1 · 美療師 1',
  sample:3, cur:'NT$', vYear:144, firstYear:true,
  invest:{'加盟金（一次性）':600000,'裝修工程':900000,'設備儀器':420000,'首批貨品':220000,'開辦其他':130000,'保證金（待確認）':0},
- p:{ownVisits:70,ownTicket:2900,vVisits:12,upRate:.30,upTicket:1600,subsidy:300,
+ p:{ownVisits:70,ownTicket:2900,vVisits:12,upRate:.30,upTicket:1600,subsidy:300,convRate:.18,repeatPerYear:6,
     redeemValue:50000,sellRate:.45,rent:42000,staff:88000,bonusRate:.08,materialRate:.18,
     mgmtFee:25000,mktRate:.05,misc:18000,deco:900000,equip:420000}}
 ];
@@ -394,10 +409,12 @@ const NINE = [
      '2027Q4 產出第一張大陸卡 v0.1（內部版，不對外發布）。']}},
 
 {en:'CURRENT STATUS', zh:'現況', q:'目前真實的門店營收數據、人員缺口、老客佔比及客戶痛點分析。',
- peek:'台灣制度數字齊全但認知錯誤嚴重；大陸在基礎資料彙編中為零筆。',
- tw:{p:'【已確認】加盟金 60 萬一次性、管理費 25,000／月、票券分潤零、管理費可兌會員價 5 萬貨品、每位引流客補給費 ≥300 元、票券配發 50–300 位／年、中部以北為大宗。',
+ peek:'台灣制度數字齊全，但店端對管理費與票券價值有兩個明確抱怨；大陸在基礎資料彙編中為零筆。',
+ tw:{p:'【已確認】加盟金 60 萬一次性、管理費 25,000／月、管理費可兌會員價 5 萬貨品、每位引流客補給費 ≥300 元（非零分潤）、票券配發 50–300 位／年、中部以北為大宗。',
    ul:['【已確認】加盟主 45–60 歲、店內人力 ≤3 人，客源高度依賴票券。',
-     '【已確認】成本認知錯誤：誤以為加盟金每年付、誤以為票券有分潤，長期自認「一年背 90 萬、被抽三層」。',
+     '<b>店端抱怨一</b>：「公司收了管理費，沒得到任何東西，也沒感覺被管理到。」',
+     '<b>店端抱怨二</b>：「折數太高沒獲利，團購／電視票券的利潤太低。」',
+     '<b>被忽略的效益</b>：票券客除 300 元補給費外，尚有現場加購與轉正後回購貢獻；導入新客的實際獲利大於補給費本身，惟此段從未被算成數字呈現給店端。',
      '【已確認】對配比規則易誤解為「大小眼」——問題在資訊與信任，不在規則本身。',
      '【模擬設定·需驗證】兌貨憑感覺挑，櫃上有三支幾乎沒動過的滯銷品。',
      '【待確認】保證金有無、商圈保護半徑、票券選店排序規則、加購歸屬。']},
@@ -504,11 +521,14 @@ const NINE = [
    問答（台／陸各一組）
    ══════════════════════════════════════════════ */
 const QA_TW=[
- {b:'管理費爭議', q:'每個月被扣 25,000，一年 30 萬，這錢到底換到什麼？',
-  a:'以 <b>T-N-01（標準店・加盟 60・北部帶）v1.0</b> 的群體中位數計算：<br>月付管理費 <b>NT$25,000</b>，可兌換會員價 <b>NT$50,000</b> 的貨品。以群體平均售出率 60% 計，實現 <b>NT$30,000</b>；加上該卡票券配額 15 位 × 補給費 300 元＝<b>NT$4,500</b>。<br><br>合計回收 <b>NT$34,500</b>，<b>管理費淨額為 -NT$9,500（淨回收）</b>，尚未計入設計點數與教育名額。<br><br>關鍵變數是<b>兌貨售出率</b>：售出率若掉到 40%，回收降為 NT$24,500，管理費才真的變成淨支出 NT$500。這一項在你自己手上。',
-  c:'引用：T-N-01 v1.0（示範假設值）。制度數字取自基礎資料彙編【已確認】項目。'},
+ {b:'管理費沒感覺', q:'公司每個月收 25,000 管理費，我根本沒得到什麼東西，也沒感覺被管理到。',
+  a:'這句話要拆成「拿到什麼」跟「感覺到什麼」兩件事，卡上只能回答第一件。<br><br>以 <b>T-N-01（標準店・加盟 60・北部帶）</b> 的群體中位數：月付 <b>NT$25,000</b>，換到會員價 <b>NT$50,000</b> 的兌貨額度。以群體平均售出率 60% 計，實現 <b>NT$30,000</b>；加上票券配額 15 位 × 補給費 300 元＝<b>NT$4,500</b>。合計 <b>NT$34,500</b>，<b>管理費為淨回收 NT$9,500</b>，尚未計入設計點數與教育名額。<br><br>但這裡有個誠實的地方：<b>如果兌貨堆在櫃子裡沒賣掉，這筆錢就真的沒回來。</b>售出率掉到 40%，回收降為 NT$24,500，管理費就變成淨支出。<br><br>所以卡把它做成滑桿，不是要說服你「總部給得夠多」，是要讓這件事變成一個<b>你自己能動的數字</b>。至於「沒感覺被管理到」——那是顧問到店頻次與內容的問題，不在這張卡上，屬於方針一的權益健診。',
+  c:'引用：T-N-01（示範假設值）。制度數字取自基礎資料彙編【已確認】項目。'},
+ {b:'票券折數太低', q:'團購票券、電視票券折數壓那麼低，做一單根本沒賺頭，為什麼還要接？',
+  a:'因為那一單的毛利，不是它真正的價值——<b>它帶進來的是一個新客</b>。<br><br>先把制度講清楚：<b>票券不是零分潤</b>。每位票券客到店，店端可領 <b>NT$300 補給費</b>（【已確認】制度）。但重點不在這 300 元。<br><br>以 <b>T-N-01</b> 的假設試算一位票券客的年度價值：<br>・到店補給費　<b>NT$300</b><br>・現場加購毛利（35% × NT$1,800 × 毛利 74%）　<b>+NT$466</b><br>・轉正後首年貢獻（轉正 18% × NT$3,200 × 6 次 × 毛利）　<b>+NT$2,557</b><br>合計 <b>約 NT$3,323／位，是補給費的 11 倍</b>。<br><br>換句話說：<b>你算的是那一單，總部買的是那個人。</b>票券單本身接近打平是設計上的必然——那是獲客成本，總部替你付掉了。真正決定賺不賺的，是這位客人有沒有留下來。<br><br>所以卡上把「轉正率」做成滑桿：轉正率 0%，一位票券客只值 766 元；轉正率 25%，值 4,000 元以上。<b>這個數字在你手上，不在折數上。</b>',
+  c:'引用：T-N-01 導客價值試算。補給費 NT$300 為【已確認】制度；轉正率與回購次數為【模擬設定·需驗證】，實際值待 2026Q4 盤點。'},
  {b:'配比大小眼', q:'為什麼北部的店票券客那麼多，我們南部就這麼少？是不是總部大小眼？',
-  a:'配比依據為四項：合約簽約額度、<b>地區票券購買人口</b>、店端人力消化量、店址區位（【已確認】制度）。<br><br>模組卡把這件事攤開比較：<b>T-N-01</b>（北部帶）與 <b>T-S-03</b>（南部帶）是同店型、同合約等級（加盟 60）的兩張卡。差異在票券配額 15 位／月 vs 5 位／月，來自地區票券購買人口——這是市場結構，不是分配決策。<br><br>但南部卡的租金低 NT$23,000／月。兩相抵銷後，南部卡回收期仍多約 4 個月。<b>這個差距是真的，卡上不會藏起來。</b>因應方式在自有客經營，不在爭配額。',
+  a:'配比依據為四項：合約簽約額度、<b>地區票券購買人口</b>、店端人力消化量、店址區位（【已確認】制度）。<br><br>模組卡把這件事攤開比較：<b>T-N-01</b>（北部帶）與 <b>T-S-03</b>（南部帶）是同店型、同合約等級（加盟 60）的兩張卡。差異在票券配額 15 位／月 vs 5 位／月，來自地區票券購買人口——這是市場結構，不是分配決策。<br><br>但南部卡的租金低 NT$23,000／月。兩相抵銷後，南部卡回收期仍多約 4 個月。<b>這個差距是真的，卡上不會藏起來。</b><br><br>但配額只是入口。同樣 5 位票券客，轉正率 10% 與 25% 的年度價值差距超過一倍——<b>南部店真正該爭的是留客率，不是配額。</b>',
   c:'引用：T-N-01 與 T-S-03 對照。配比四因素為【已確認】制度，票券人口差異為【不可改變】結構因素。'},
  {b:'要求保證', q:'你們保證多久回本？',
   a:'<b>不保證。</b>模組卡提供的是群體統計推導的區間，不是對個別門店的承諾。<br><br>能提供的是三件事：① 完整假設條件（卡片背面全部公開）；② 每季用實際群體數據校準的紀錄；③ 首年新店卡 <b>T-X-05</b> 的基準情境<b>是虧損的</b>——我們把會虧的那張卡也放在庫裡，就是為了讓你在簽約前看到最差狀況。<br><br>會給你看虧損卡的體系，講獲利時才有份量。',
@@ -556,12 +576,24 @@ function faceTW(){
         <div><div class="k">靜態回收期</div><div class="v">${pb===Infinity?'—':pb.toFixed(0)}</div><div class="u">${pb===Infinity?'基準情境不回收':'個月（基準情境）'}</div></div>
       </div>
       <div class="hi">
-        <div class="t">▍台灣卡專屬欄位 · 管理費兌現</div>
+        <div class="t">▍台灣卡專屬欄位一 · 管理費換到什麼</div>
         <div class="rowline"><span class="l">月付管理費</span><span class="r">${money(c.p.mgmtFee)}</span></div>
         <div class="rowline"><span class="l">兌貨會員價 5 萬 × 售出率 ${pct(c.p.sellRate)}</span><span class="r">＋${money(r.goodsRev)}</span></div>
-        <div class="rowline"><span class="l">補給費 300 × 票券客 ${c.p.vVisits} 位</span><span class="r">＋${money(r.subsidy)}</span></div>
-        <div class="rowline"><span class="l"><b>管理費淨額</b></span><span class="r"><b style="color:${r.mgmtNet<0?'var(--ok)':'var(--bad)'}">${r.mgmtNet<0?'淨回收 '+money(-r.mgmtNet):'淨支出 '+money(r.mgmtNet)}</b></span></div>
-        <div style="font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.6">尚未計入設計點數與教育名額（非現金）。票券分潤為<b>零</b>，店端不需支付總部任何票券分潤。</div>
+        <div class="rowline"><span class="l">票券客補給費 300 × ${c.p.vVisits} 位</span><span class="r">＋${money(r.subsidy)}</span></div>
+        <div class="rowline"><span class="l"><b>管理費淨額（僅現金項）</b></span><span class="r"><b style="color:${r.mgmtNet<0?'var(--ok)':'var(--bad)'}">${r.mgmtNet<0?'淨回收 '+money(-r.mgmtNet):'淨支出 '+money(r.mgmtNet)}</b></span></div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.6">
+          尚未計入設計點數、教育名額（非現金），也<b>尚未計入下方票券客的導客價值</b>。</div>
+      </div>
+      <div class="hi" style="background:#EDF2F7;border-color:#C3D3E0">
+        <div class="t" style="color:#1F3B66">▍台灣卡專屬欄位二 · 一位票券客的實際價值（年度）</div>
+        <div class="rowline"><span class="l">到店補給費（每位）</span><span class="r">${money(c.p.subsidy)}</span></div>
+        <div class="rowline"><span class="l">現場加購毛利（${pct(c.p.upRate)} × ${money(c.p.upTicket)} × 毛利 ${pct(r.gm)}）</span><span class="r">＋${money(r.vUpValue)}</span></div>
+        <div class="rowline"><span class="l">轉正後首年貢獻（轉正 ${pct(c.p.convRate)} × ${money(c.p.ownTicket)} × ${c.p.repeatPerYear} 次 × 毛利）</span><span class="r">＋${money(r.vConvValue)}</span></div>
+        <div class="rowline"><span class="l"><b>每位票券客實際價值</b></span><span class="r"><b style="color:var(--ok)">${money(r.vUnitValue)}　≈ 補給費的 ${r.vFold.toFixed(1)} 倍</b></span></div>
+        <div class="rowline"><span class="l">本卡年度票券客導入價值（${c.p.vVisits} 位／月）</span><span class="r"><b>${money(r.vYearValue)}／年</b></span></div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.6">
+          票券客<b>不是零分潤</b>：每位帶 ${money(c.p.subsidy)} 補給費進店，而導入新客的實際獲利遠大於補給費本身。
+          轉正率 ${pct(c.p.convRate)} 為【模擬設定·需驗證】，實際值待 2026Q4 盤點。</div>
       </div>
       <div class="blocklabel">基準情境 月損益</div>
       <div class="rowline"><span class="l">月營收（服務＋商品＋補給）</span><span class="r">${money(r.rev)}</span></div>
@@ -580,8 +612,10 @@ function faceTW(){
       ['自有客人次',c.p.ownVisits+' 人次','各店 POS 中位數（去識別）',''],
       ['自有客單價',money(c.p.ownTicket),'實收客單中位數',''],
       ['票券客配額',c.p.vVisits+' 位／月','合約額度＋地區票券人口＋人力＋店址','【已確認】四因素'],
-      ['票券補給費',money(c.p.subsidy)+'／客','現行制度：每位引流客 ≥300 元','【已確認】'],
+      ['票券補給費',money(c.p.subsidy)+'／客','現行制度：每位引流客 ≥300 元','【已確認】非零分潤'],
       ['票券加購率',pct(c.p.upRate)+' × '+money(c.p.upTicket),'店端推加購','【待確認】加購歸屬'],
+      ['票券客轉正率',pct(c.p.convRate),'票券客轉為自有回購客之比率','【模擬設定·需驗證】'],
+      ['轉正客年回購次數',c.p.repeatPerYear+' 次／年','自有客回購頻次','【模擬設定·需驗證】'],
       ['兌貨額度',money(c.p.redeemValue)+'（會員價）','管理費 25,000 換會員價 5 萬','【已確認】'],
       ['兌貨售出率',pct(c.p.sellRate),'群體實際銷售／兌入','【模擬設定·需驗證】'],
       ['月租金',money(c.p.rent)+'（佔營收 '+pct(c.p.rent/r.rev)+'）','近 12 個月新簽租約',''],
@@ -663,7 +697,7 @@ function pageCard(){
 
   const c=TW.find(x=>x.code===selCard)||TW[0];
   return `
-   <p class="lead">模組卡＝<b>一張卡講完一種店</b>。正面是決策數字，背面是算出這些數字的假設。台灣卡比通用版多一塊<b>「管理費兌現」</b>——因為彙編指出加盟主最深的痛點不是「不知道能賺多少」，而是<b>誤以為加盟金每年付、誤以為票券有分潤，長期自認一年背 90 萬</b>。卡上第一個要算清楚的，是他到底買到了什麼。</p>
+   <p class="lead">模組卡＝<b>一張卡講完一種店</b>。正面是決策數字，背面是算出這些數字的假設。台灣卡比通用版多兩塊專屬欄位——<b>「管理費換到什麼」</b>與<b>「一位票券客的實際價值」</b>。因為加盟主最常說的兩句話是「管理費收了我沒得到東西」和「票券折數太高沒賺頭」，而<b>票券真正的價值不在那一單的毛利，在它帶進來的是一個新客</b>——這件事從來沒被算成數字給店端看過。</p>
    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
      <button class="btn pri sm" id="flip">${faceBack?'翻面 ⇄ 看決策數字':'翻面 ⇄ 看假設條件'}</button>
      <span class="note" style="margin-right:6px">實體卡：A5 雙面，招商簡報／展店會議用　｜　換一張卡看：</span>
@@ -684,11 +718,20 @@ function pageCard(){
          </table>
        </div>
        <div class="panel" style="margin-top:14px">
-         <h3 style="font-size:15px;margin-bottom:4px">台灣卡為什麼要有「管理費兌現」這一塊</h3>
+         <h3 style="font-size:15px;margin-bottom:4px">台灣卡要正面回應的兩個真實抱怨</h3>
          <div class="stack" style="margin-top:10px">
-           <div class="srow"><div class="sl">痛點原文</div><div class="sd">「誤以為加盟金 60 萬是每年支付，且以為票券有分潤，因此長期認定自己<b>一年背 90 萬、被抽三層</b>」——基礎資料彙編【已確認】。</div></div>
-           <div class="srow"><div class="sl">實際制度</div><div class="sd">加盟金 60 萬<b>一次性</b>、票券分潤<b>零</b>、管理費 25,000 可兌<b>會員價 5 萬</b>貨品，另有每位引流客 ≥300 元補給費。</div></div>
-           <div class="srow"><div class="sl">卡的作用</div><div class="sd">把三筆數字放在同一格，爭議從「你們收太多」變成<b>「我兌貨賣掉幾成」</b>——一個店主自己能改變的行為指標。</div></div>
+           <div class="srow"><div class="sl">抱怨一</div><div class="sd">
+             「<b>公司收了管理費，我沒得到任何東西、也沒感覺被管理到。</b>」<br>
+             <span class="note">→ 卡面欄位一直接列帳：25,000 元換到會員價 5 萬的兌貨額度＋票券客補給費。看得到的東西才算給了。</span></div></div>
+           <div class="srow"><div class="sl">抱怨二</div><div class="sd">
+             「<b>折數太高沒獲利，團購票券、電視票券的利潤太低。</b>」<br>
+             <span class="note">→ 這是把票券當「一次低價療程」在算。票券的價值不在那一單的毛利，在<b>它帶進來的是一個新客</b>。</span></div></div>
+           <div class="srow"><div class="sl">被忽略的</div><div class="sd">
+             票券客<b>不是零分潤</b>：每位到店帶 300 元補給費，加上現場加購毛利與轉正後的回購貢獻，
+             <b>一位票券客的實際年度價值約為補給費的數倍</b>。這一段從來沒被算給店端看過，所以只記得「那一單很便宜」。</div></div>
+           <div class="srow"><div class="sl">卡的作用</div><div class="sd">
+             把導客價值算成數字放上卡，爭議從「你們收太多」變成<b>「我兌貨賣掉幾成、票券客我留下幾成」</b>——
+             兩個店主自己能改變的行為指標。</div></div>
          </div>
        </div>
      </div>
@@ -699,7 +742,18 @@ function pageLib(){
   if(REGION==='cn'){
     const done=CN_GAPS.filter(g=>g.s==='yes').length;
     return `
-    <p class="lead">大陸地區 2027 唯一能對外交付的文件是 <b>C-M0 經銷授權前置卡</b>——它不談獲利，談授權。這些內容<b>現在就有明確答案</b>，而且是簽約真正需要確認的事；獲利預測反而是簽約後才驗證得了的。</p>
+    <p class="lead">大陸地區 2027 唯一能對外交付的文件是 <b>C-M0 經銷授權前置卡</b>。</p>
+    <div class="panel" style="margin-bottom:16px;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent2)">
+      <h3 style="font-size:15px;margin-bottom:8px">什麼是「C-M0 經銷授權前置卡」？</h3>
+      <table>
+        <tr><td style="width:118px;color:var(--muted)">一句話</td><td><b>把「簽這份約，我到底被授權了什麼、要負什麼義務」寫成一張 A5 卡</b>，在洽談時當場攤開。</td></tr>
+        <tr><td style="color:var(--muted)">卡號含意</td><td><b>C</b> = China 大陸地區　<b>M0</b> = Module 0，模組卡的第 0 號。編號 0 代表它<b>排在所有獲利卡之前</b>——沒有它，後面的卡都不會存在。</td></tr>
+        <tr><td style="color:var(--muted)">和獲利卡的差別</td><td>獲利卡回答「<b>我會賺多少</b>」，需要樣本統計，大陸現在做不到；<br>前置卡回答「<b>我被授權什麼、雙方各要做什麼</b>」，答案來自制度與合約，<b>現在就寫得出來</b>。</td></tr>
+        <tr><td style="color:var(--muted)">為什麼要有它</td><td>如果只說「大陸沒有卡」，招商人員手上就是空的。C-M0 讓「沒有獲利卡」不等於「沒有東西可談」——<b>而且它談的是簽約當下真正該確認的事</b>；獲利預測反而是簽約後才驗證得了的。</td></tr>
+        <tr><td style="color:var(--muted)">誰用、何時用</td><td>招商人員與展店顧問，於洽談當場逐條說明並留存簽名版；經銷商帶回作為決策依據。</td></tr>
+        <tr style="background:var(--accent2)"><td style="border-bottom:0;color:var(--accent3)"><b>隱藏的真正用途</b></td><td style="border-bottom:0"><b>把「月結資料回報義務」寫進去。</b>這是全案關鍵——沒有這一列，2028 年仍然出不了獲利卡。詳見右欄。</td></tr>
+      </table>
+    </div>
     <div class="cardstage">
       <div class="mcard">
         <div class="hd"><div><div class="t1">大陸地區 · 經銷授權前置卡</div><h3>授權條件說明</h3>
@@ -863,6 +917,7 @@ function pageCalc(){
     {k:'ownTicket',label:'自有客單價',min:1800,max:5000,step:100,fmt:v=>money(v)},
     {k:'sellRate',label:'兌貨售出率　← 你自己能改的',min:.2,max:1,step:.05,fmt:v=>pct(v)},
     {k:'vVisits',label:'票券配額（位／月）',min:0,max:35,step:1,fmt:v=>v+' 位'},
+    {k:'convRate',label:'票券客轉正率　← 你自己能改的',min:0,max:.5,step:.01,fmt:v=>pct(v)},
     {k:'rent',label:'月租金',min:20000,max:110000,step:1000,fmt:v=>money(v)},
     {k:'staff',label:'人事合計（含店主）',min:50000,max:220000,step:2000,fmt:v=>money(v)},
     {k:'materialRate',label:'材料成本率',min:.10,max:.26,step:.005,fmt:v=>pct(v)}
@@ -878,7 +933,7 @@ function pageCalc(){
     .concat([{k:'月淨利',v:base.profit,cls:base.profit<0?'loss':'prof'}]);
   const be=breakEvenOwn(cp);
   return `
-   <p class="lead">加盟主拿到卡之後最想做的事：<b>把自己談到的租金、自己估的來客填進去</b>。台灣版多了一根關鍵滑桿——<b>兌貨售出率</b>。拉動它，就看到管理費淨額怎麼從「淨支出」變「淨回收」。<b>系統只算，不承諾。</b></p>
+   <p class="lead">加盟主拿到卡之後最想做的事：<b>把自己談到的租金、自己估的來客填進去</b>。台灣版多了兩根關鍵滑桿——<b>兌貨售出率</b>與<b>票券客轉正率</b>，兩者都標「你自己能改的」。拉動它們，就看到管理費怎麼從「淨支出」變「淨回收」、一位票券客怎麼從 300 元變成數千元。<b>系統只算，不承諾。</b></p>
    <div class="calcwrap">
      <div class="panel">
        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
@@ -888,11 +943,19 @@ function pageCalc(){
        <div id="sliders">${SL.map(s=>`<div class="slider"><div class="lab"><span>${s.label}</span><b>${s.fmt(cp[s.k])}</b></div>
          <input type="range" data-k="${s.k}" min="${s.min}" max="${s.max}" step="${s.step}" value="${cp[s.k]}"></div>`).join('')}</div>
        <div class="hi" style="margin-top:4px">
-         <div class="t">▍管理費兌現（隨售出率即時變動）</div>
+         <div class="t">▍管理費換到什麼（隨售出率即時變動）</div>
          <div class="rowline"><span class="l">月付管理費</span><span class="r">${money(cp.mgmtFee)}</span></div>
          <div class="rowline"><span class="l">兌貨售出 ${pct(cp.sellRate)}</span><span class="r">＋${money(base.goodsRev)}</span></div>
          <div class="rowline"><span class="l">補給費 ${cp.vVisits} 位 × 300</span><span class="r">＋${money(base.subsidy)}</span></div>
-         <div class="rowline"><span class="l"><b>管理費淨額</b></span><span class="r"><b style="color:${base.mgmtNet<0?'var(--ok)':'var(--bad)'}">${base.mgmtNet<0?'淨回收 '+money(-base.mgmtNet):'淨支出 '+money(base.mgmtNet)}</b></span></div>
+         <div class="rowline"><span class="l"><b>管理費淨額（僅現金項）</b></span><span class="r"><b style="color:${base.mgmtNet<0?'var(--ok)':'var(--bad)'}">${base.mgmtNet<0?'淨回收 '+money(-base.mgmtNet):'淨支出 '+money(base.mgmtNet)}</b></span></div>
+       </div>
+       <div class="hi" style="margin-top:10px;background:#EDF2F7;border-color:#C3D3E0">
+         <div class="t" style="color:#1F3B66">▍一位票券客的實際價值（隨轉正率即時變動）</div>
+         <div class="rowline"><span class="l">補給費</span><span class="r">${money(cp.subsidy)}</span></div>
+         <div class="rowline"><span class="l">現場加購毛利</span><span class="r">＋${money(base.vUpValue)}</span></div>
+         <div class="rowline"><span class="l">轉正後首年貢獻</span><span class="r">＋${money(base.vConvValue)}</span></div>
+         <div class="rowline"><span class="l"><b>每位實際價值</b></span><span class="r"><b style="color:var(--ok)">${money(base.vUnitValue)}　≈ 補給費的 ${base.vFold.toFixed(1)} 倍</b></span></div>
+         <div class="rowline"><span class="l">年度導客價值（${cp.vVisits} 位／月）</span><span class="r"><b>${money(base.vYearValue)}／年</b></span></div>
        </div>
      </div>
      <div>
@@ -914,7 +977,7 @@ function pageCalc(){
            系統只呈現計算結果，不對個別門店做任何獲利承諾。</span>
          </div>
        </div>
-       <p class="note" style="margin-top:12px">※ 折舊以裝修＋設備 5 年直線攤提計入。加盟金 60 萬為一次性支出，計入開辦投資但不計入月損益。票券分潤為零，店端不需支付總部任何票券分潤。</p>
+       <p class="note" style="margin-top:12px">※ 折舊以裝修＋設備 5 年直線攤提計入。加盟金 60 萬為一次性支出，計入開辦投資但不計入月損益。<b>票券客補給費為店端收入（非零分潤）</b>；上方「票券客實際價值」為年度導客效益試算，未重複計入月損益，避免灌水。</p>
      </div>
    </div>`;
 }
@@ -1148,8 +1211,8 @@ function pageCmp(){
        <tr><td>2027 交付物</td><td><b>區域獲利模組卡（5 張，對外公開）</b></td><td><b>資料地基＋經銷授權前置卡</b>（不含獲利數字）</td></tr>
        <tr><td>分群維度</td><td>合約等級 × 店型 × 票券人口帶</td><td>城市等級 × 店型（<b>標準未定義</b>）</td></tr>
        <tr><td>樣本狀態</td><td>各分群 3–12 店，達門檻</td><td><b>0 家</b>，未達門檻</td></tr>
-       <tr><td>制度數字</td><td>加盟金 60 萬一次性／管理費 25,000／兌貨會員價 5 萬／補給費 ≥300／票券分潤零（皆【已確認】）</td><td>經銷制度細節文件未涵蓋；收費結構、定價權、保護半徑<b>全未定義</b></td></tr>
-       <tr><td>卡片專屬欄位</td><td><b>管理費兌現</b>（兌貨售出率 × 會員價 5 萬 ＋ 補給費）</td><td>不適用——大陸無票券體系、無兌貨制度</td></tr>
+       <tr><td>制度數字</td><td>加盟金 60 萬一次性／管理費 25,000／兌貨會員價 5 萬／每位引流客補給費 ≥300 元（非零分潤，皆【已確認】）</td><td>經銷制度細節文件未涵蓋；收費結構、定價權、保護半徑<b>全未定義</b></td></tr>
+       <tr><td>卡片專屬欄位</td><td><b>①管理費換到什麼</b>（兌貨售出率 × 會員價 5 萬 ＋ 補給費）<br><b>②一位票券客的實際價值</b>（補給費＋加購毛利＋轉正貢獻）</td><td>不適用——大陸無票券體系、無兌貨制度</td></tr>
        <tr><td>資料流</td><td>出貨／票券／POS 三條，總部已握有</td><td>無回報機制、無義務條款（<b>斷點在第一步</b>）</td></tr>
        <tr><td>AI 角色</td><td>彙整、偏離標記、問答引用（皆人審後生效）</td><td>僅條款比對與繁簡版本；<b>無資料可統計</b></td></tr>
        <tr><td>2027 主 KPI</td><td>涵蓋店型 ≥80%、每季 1 版、洽談採用率 100%</td><td><b>出卡前置條件掌握格數 0/8 → ≥6/8</b>（刻意不設營收 KPI）</td></tr>
@@ -1169,7 +1232,7 @@ function pageCmp(){
    <h2 class="sec">待總經理裁示（五項）</h2>
    <div class="stack">
      <div class="srow"><div class="sl">決策一</div><div class="sd"><b>公開到什麼程度？</b>只給已簽約加盟主，還是招商階段的潛在夥伴也能看（簽 NDA）。本樣張假設為後者——透明度是這案的價值來源，但也意味著競業可能取得。</div></div>
-     <div class="srow"><div class="sl">決策二</div><div class="sd"><b>管理費兌現欄是否上卡？</b>這是台灣卡最有價值也最敏感的一欄：它會同時揭露「總部給的比想像多」與「你自己沒把兌貨賣掉」。建議上卡——彙編指出加盟主的成本認知錯誤已造成長期怨懟，不講清楚只會繼續累積。</div></div>
+     <div class="srow"><div class="sl">決策二</div><div class="sd"><b>兩塊台灣專屬欄位是否上卡？</b>「管理費換到什麼」與「一位票券客的實際價值」是台灣卡最有價值也最敏感的兩欄：前者同時揭露「總部給的比想像多」與「你自己沒把兌貨賣掉」；後者把票券從「折數太低的一單」重新定義為「總部替你付掉獲客成本的一個新客」。建議上卡——這兩個抱怨已存在多年，不用數字回答只會持續累積。</div></div>
      <div class="srow"><div class="sl">決策三</div><div class="sd"><b>保證金與商圈保護半徑是否揭露？</b>兩項在彙編中均列為【待確認】資訊缺口。卡片上目前留白並標示——若總部已有規定但未文件化，這是最快能補上的一格。</div></div>
      <div class="srow"><div class="sl">決策四</div><div class="sd"><b>大陸軌是否接受「2027 交白卡」的可能？</b>本提案明列 Stop 條件：樣本未達門檻寧可延後，不得以台灣數據換算發布。此決策等於預先授權年底的專案經理拒絕交出假卡。</div></div>
      <div class="srow"><div class="sl">決策五</div><div class="sd"><b>大陸新約範本何時開始改？</b>Q2 是提案時程，但每晚一季就多一批沒有回報義務的合約。若管理階層同意，這件事可以在 Q1 就啟動法務作業。</div></div>
@@ -1200,7 +1263,7 @@ function render(){
   document.getElementById('main').innerHTML=(PAGES[TAB]||pageCard)();
   document.getElementById('foot').innerHTML=
     `區域獲利模組卡 v2 · 台灣／大陸雙軌功能樣張｜海欣大中華 2027 年度方針三 · 提案 A ｜ 本樣張所有數字為<b>格式示範用假設值</b>，非核定數字、非任何形式之獲利承諾。<br>
-     制度參數（加盟金 60 萬一次性／管理費 25,000／兌貨會員價 5 萬／補給費 ≥300／票券分潤零）取自《VIVISPA 加盟體系基礎資料彙編》標示【已確認】之項目；標【待確認】者為該文件已列明之資訊缺口。<br>
+     制度參數（加盟金 60 萬一次性／管理費 25,000／兌貨會員價 5 萬／每位引流客補給費 ≥300 元・非零分潤）取自《VIVISPA 加盟體系基礎資料彙編》標示【已確認】之項目；標【待確認】者為該文件已列明之資訊缺口。<br>
      真實卡片須以總部財務盤點之去識別群體統計為準，經財務簽核後發版。`;
   bind();
   history.replaceState(null,'','#/'+REGION+'/'+TAB);
