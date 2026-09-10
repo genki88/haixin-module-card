@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>區域獲利模組卡 · 功能樣張｜海欣大中華 2027 方針三</title>
+<style>
+:root{
+  --paper:#F5F3EE; --card:#FFFFFF; --ink:#1B1A17; --muted:#6E6A61; --faint:#9A958A;
+  --line:#E3DFD6; --line2:#CFC9BC;
+  --accent:#0E5A54; --accent2:#E7F0EE; --accent3:#0A403C;
+  --warn:#B4761E; --warn2:#FBF1E0;
+  --bad:#A33B2E; --bad2:#F8EBE8;
+  --ok:#2F7A4F; --ok2:#E9F3ED;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+h1,h2,h3,h4{margin:0;font-weight:700;line-height:1.3;text-wrap:pretty}
+a{color:inherit}
+
+/* ── shell ── */
+header.top{
+  position:sticky;top:0;z-index:50;background:rgba(245,243,238,.93);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+}
+.top-in{max-width:1240px;margin:0 auto;padding:14px 28px 0}
+.brandrow{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.mark{width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-weight:700;font-size:15px;letter-spacing:.5px}
+.brandrow h1{font-size:19px;letter-spacing:.2px}
+.brandrow .sub{color:var(--muted);font-size:12.5px;padding-bottom:2px}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;
+  border:1px solid var(--line2);color:var(--muted);background:#fff}
+nav.tabs{display:flex;gap:2px;margin-top:12px;overflow-x:auto}
+nav.tabs button{
+  appearance:none;border:0;background:transparent;font:inherit;font-size:13.5px;
+  padding:9px 15px 11px;color:var(--muted);cursor:pointer;white-space:nowrap;
+  border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+nav.tabs button:hover{color:var(--ink);background:#EDEAE3}
+nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+main{max-width:1240px;margin:0 auto;padding:26px 28px 90px}
+section[hidden]{display:none}
+.lead{max-width:760px;color:var(--muted);font-size:14px;margin:0 0 20px}
+.lead b{color:var(--ink)}
+h2.sec{font-size:15px;letter-spacing:.4px;margin:30px 0 12px;display:flex;align-items:center;gap:10px}
+h2.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+h2.sec:first-of-type{margin-top:4px}
+
+/* ── generic surfaces ── */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.grid{display:grid;gap:14px}
+.note{font-size:12.5px;color:var(--faint);line-height:1.6}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2.5px 8px;border-radius:5px;font-weight:600}
+.tag.a{background:var(--accent2);color:var(--accent3)}
+.tag.w{background:var(--warn2);color:var(--warn)}
+.tag.b{background:var(--bad2);color:var(--bad)}
+.tag.o{background:var(--ok2);color:var(--ok)}
+.tag.n{background:#EDEAE3;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.3px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td{border-top:1.5px solid var(--line2);border-bottom:0;font-weight:700}
+
+/* ── 卡面 ── */
+.cardstage{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:26px;align-items:start}
+.mcard{
+  background:var(--card);border:1px solid var(--line2);border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(0,0,0,.03),0 12px 30px -22px rgba(0,0,0,.5);
+  max-width:430px;
+}
+.mcard .hd{background:var(--accent);color:#fff;padding:13px 16px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.mcard .hd .t1{font-size:11px;opacity:.72;letter-spacing:1.4px}
+.mcard .hd h3{font-size:17px;margin-top:2px}
+.mcard .hd .code{font-size:10.5px;opacity:.8;font-variant-numeric:tabular-nums;text-align:right;line-height:1.5}
+.mcard .body{padding:14px 16px 16px}
+.kpi3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.kpi3 div{background:#FCFBF9;padding:10px 8px;text-align:center}
+.kpi3 .k{font-size:10.5px;color:var(--muted)}
+.kpi3 .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
+.kpi3 .u{font-size:10.5px;color:var(--faint)}
+.rowline{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dotted var(--line2);font-size:13px}
+.rowline:last-child{border-bottom:0}
+.rowline .l{color:var(--muted)}
+.rowline .r{font-variant-numeric:tabular-nums}
+.blocklabel{font-size:11px;letter-spacing:1px;color:var(--faint);margin:12px 0 5px;font-weight:600}
+.disclaim{margin-top:12px;background:#FAF8F4;border:1px dashed var(--line2);border-radius:7px;padding:9px 11px;font-size:11.5px;color:var(--muted);line-height:1.6}
+.flipwrap{perspective:1600px}
+.flipbtn{margin-bottom:10px}
+.btn{appearance:none;font:inherit;font-size:13px;padding:7px 14px;border-radius:7px;border:1px solid var(--line2);
+  background:#fff;color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:var(--accent3);color:#fff}
+.btn.sm{font-size:12px;padding:5px 10px}
+
+/* ── 模組庫 ── */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.chip{appearance:none;font:inherit;font-size:12.5px;padding:5px 12px;border-radius:99px;border:1px solid var(--line2);
+  background:#fff;color:var(--muted);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:14px}
+.lib{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;cursor:pointer;
+  transition:border-color .15s,transform .15s}
+.lib:hover{border-color:var(--accent);transform:translateY(-2px)}
+.lib.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent2)}
+.lib .code{font-size:10.5px;color:var(--faint);letter-spacing:1px}
+.lib h4{font-size:15px;margin:2px 0 2px}
+.lib .meta{font-size:12px;color:var(--muted);margin-bottom:10px}
+.lib .two{display:flex;gap:14px;border-top:1px solid var(--line);padding-top:9px}
+.lib .two div{flex:1}
+.lib .two .k{font-size:10.5px;color:var(--muted)}
+.lib .two .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.bar{height:5px;border-radius:3px;background:#EDEAE3;overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;background:var(--accent)}
+
+/* ── 試算 ── */
+.calcwrap{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:20px;align-items:start}
+@media(max-width:860px){.calcwrap{grid-template-columns:1fr}.cardstage{grid-template-columns:1fr}}
+.slider{margin-bottom:15px}
+.slider .lab{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+.slider .lab b{font-variant-numeric:tabular-nums;font-size:14px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.scen{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.scen div{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:11px 12px;text-align:center}
+.scen .k{font-size:11px;color:var(--muted)}
+.scen .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.scen .u{font-size:11px;color:var(--faint)}
+.scen div.mid{border-color:var(--accent);background:var(--accent2)}
+.waterfall{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.wf{display:grid;grid-template-columns:96px 1fr 108px;align-items:center;gap:10px;font-size:12.5px}
+.wf .wl{color:var(--muted);text-align:right}
+.wf .wb{height:16px;border-radius:3px;background:#EDEAE3;position:relative;overflow:hidden}
+.wf .wb i{position:absolute;top:0;bottom:0;left:0;background:var(--line2)}
+.wf.rev .wb i{background:var(--accent)}
+.wf.prof .wb i{background:var(--ok)}
+.wf .wv{text-align:right;font-variant-numeric:tabular-nums}
+.beflag{background:var(--warn2);border:1px solid #EAD4AE;border-radius:8px;padding:11px 13px;font-size:13px;margin-top:14px}
+
+/* ── 校準 ── */
+.diff td.up{color:var(--bad);font-weight:600}
+.diff td.dn{color:var(--ok);font-weight:600}
+.timeline{display:flex;gap:0;margin:18px 0 6px;overflow-x:auto;padding-bottom:6px}
+.tl{flex:1;min-width:150px;border-top:2px solid var(--line2);padding:12px 14px 0;position:relative}
+.tl::before{content:"";position:absolute;top:-6px;left:14px;width:10px;height:10px;border-radius:99px;background:var(--line2)}
+.tl.done{border-top-color:var(--accent)}
+.tl.done::before{background:var(--accent)}
+.tl .q{font-size:11.5px;color:var(--faint);letter-spacing:.6px}
+.tl .n{font-size:13.5px;font-weight:600}
+.tl .d{font-size:12px;color:var(--muted)}
+
+/* ── AI 分工 ── */
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.zone{border-radius:var(--r);padding:16px 18px;border:1px solid}
+.zone h4{font-size:14px;display:flex;gap:8px;align-items:center;margin-bottom:4px}
+.zone ul{margin:8px 0 0;padding-left:17px;font-size:13px;line-height:1.85}
+.zone.ai{background:var(--accent2);border-color:#BFD6D2}
+.zone.hu{background:#FAF8F4;border-color:var(--line2)}
+.zone.no{background:var(--bad2);border-color:#EBCCC5}
+.chat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;max-width:720px}
+.msg{margin-bottom:12px}
+.msg .who{font-size:11px;color:var(--faint);margin-bottom:3px;letter-spacing:.5px}
+.msg .bub{padding:10px 13px;border-radius:9px;font-size:13.5px;line-height:1.7}
+.msg.u .bub{background:#EDEAE3}
+.msg.a .bub{background:var(--accent2);border:1px solid #CFE0DD}
+.msg .cite{font-size:11.5px;color:var(--muted);margin-top:7px;padding-top:7px;border-top:1px dashed #BFD6D2}
+.qbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+
+/* ── 流程 ── */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:0;margin:10px 0 4px}
+.fstep{position:relative;background:var(--card);border:1px solid var(--line);padding:14px 16px;margin-right:12px;border-radius:var(--r)}
+.fstep:last-child{margin-right:0}
+.fstep .no{font-size:10.5px;letter-spacing:1.5px;color:var(--faint)}
+.fstep h4{font-size:14px;margin:2px 0 5px}
+.fstep p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.65}
+.fstep.human{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent2)}
+.fstep .badge{position:absolute;top:-9px;right:12px}
+.loopback{margin-top:12px;border:1px dashed var(--line2);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--muted);background:#FAF8F4}
+.stack{display:grid;gap:10px}
+.srow{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px 16px}
+.srow .sl{font-size:12.5px;font-weight:600;color:var(--accent)}
+.srow .sd{font-size:13px;color:var(--muted);line-height:1.7}
+@media print{
+  header.top{position:static;background:#fff}
+  nav.tabs{display:none}
+  section[hidden]{display:block !important}
+  section{page-break-before:always}
+  section#t-card{page-break-before:auto}
+  body{background:#fff;font-size:12px}
+  main{padding:10px 0 0}
+  .mcard{box-shadow:none}
+  .lib:hover{transform:none}
+  @page{size:A4;margin:12mm}
+}
+
+/* ── 通行碼門 ── */
+#gate{position:fixed;inset:0;z-index:999;background:var(--paper);display:grid;place-items:center;padding:24px}
+#gate .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:34px 34px 30px;max-width:400px;width:100%;
+  box-shadow:0 20px 50px -34px rgba(0,0,0,.55)}
+#gate .mk{width:40px;height:40px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;margin-bottom:16px}
+#gate h2{font-size:18px;margin-bottom:4px}
+#gate p{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 18px}
+#gate input{width:100%;font:inherit;font-size:15px;padding:10px 13px;border:1px solid var(--line2);border-radius:8px;background:#FCFBF9;color:var(--ink)}
+#gate input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent2)}
+#gate .err{color:var(--bad);font-size:12.5px;margin-top:8px;min-height:18px}
+#gate .btn{width:100%;margin-top:6px;padding:11px}
+#gate .foot{font-size:11.5px;color:var(--faint);margin-top:16px;line-height:1.7;border-top:1px solid var(--line);padding-top:12px}
+body.locked{overflow:hidden}
+footer{max-width:1240px;margin:0 auto;padding:0 28px 60px;color:var(--faint);font-size:12px;line-height:1.8}
+</style>
+</head>
+<body>
+
+
+<div id="gate">
+  <div class="box">
+    <div class="mk">模</div>
+    <h2>區域獲利模組卡 · 功能樣張</h2>
+    <p>海欣大中華 2027 年度方針三｜提案 A<br>內部審閱用，請輸入通行碼。</p>
+    <input id="gpw" type="password" placeholder="通行碼" autocomplete="off">
+    <div class="err" id="gerr"></div>
+    <button class="btn pri" id="gbtn">進入</button>
+    <div class="foot">本樣張所有數字為<b>格式示範用假設值</b>，非核定數字、非任何形式之獲利承諾。請勿外傳。</div>
+  </div>
+</div>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brandrow">
+      <div class="mark">模</div>
+      <h1>區域獲利模組卡</h1>
+      <span class="sub">海欣大中華 2027 · 方針三｜提案 A 功能樣張</span>
+      <span class="pill">示範資料 · 非核定數字</span>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-t="card" aria-selected="true">① 卡長什麼樣</button>
+      <button data-t="lib">② 模組庫（6 張卡）</button>
+      <button data-t="calc">③ 加盟主自己算</button>
+      <button data-t="cal">④ 每季校準</button>
+      <button data-t="ai">⑤ AI 做哪一段</button>
+      <button data-t="flow">⑥ 資料怎麼變成卡</button>
+      <button data-t="build">⑦ 要動用什麼</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ ① 卡面 ============ -->
+<section id="t-card">
+  <p class="lead">模組卡＝<b>一張卡講完一種店</b>。正面是三個決策數字（總投資／月淨利區間／回收月數），背面是<b>算出這些數字的假設</b>。假設公開，數字才可被質疑、可被校準——這是「看模組卡算」與「聽總部說」的差別。下方是同一張卡的實體版與數位版。</p>
+
+  <div class="cardstage">
+    <div class="flipwrap">
+      <div class="flipbtn"><button class="btn pri sm" id="flip">翻面 ⇄ 看假設條件</button> <span class="note">實體卡：A5 雙面，招商簡報／展店會議用</span></div>
+      <div class="mcard" id="cardFace"></div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h3 style="font-size:15px;margin-bottom:8px">這張卡上，刻意「不寫」的東西</h3>
+        <table>
+          <tr><td>不寫單店店名、單店實際業績</td><td style="width:118px"><span class="tag b">去識別</span></td></tr>
+          <tr><td>不寫「保證回本」「保證獲利」</td><td><span class="tag b">不承諾</span></td></tr>
+          <tr><td>不寫沒有樣本支撐的城市（樣本 &lt; 3 店不出卡）</td><td><span class="tag w">樣本門檻</span></td></tr>
+          <tr><td>不寫未經財務簽核的版本（草稿不外流）</td><td><span class="tag w">人審</span></td></tr>
+          <tr><td style="border-bottom:0">不寫加盟金／管理費以外的任何總部收費</td><td style="border-bottom:0"><span class="tag a">紅線一致</span></td></tr>
+        </table>
+      </div>
+
+      <div class="panel" style="margin-top:14px">
+        <h3 style="font-size:15px;margin-bottom:4px">一張卡的三種身分</h3>
+        <div class="stack" style="margin-top:10px">
+          <div class="srow"><div class="sl">對總部</div><div class="sd">招商談判有共同語言：談的是同一組假設，不是各憑印象。</div></div>
+          <div class="srow"><div class="sl">對加盟主</div><div class="sd">簽約前拿得到、簽約後對得上：開店 6 個月後可用同一張卡回頭比對自己的實際。</div></div>
+          <div class="srow"><div class="sl">對財務</div><div class="sd">每季校準的載體：卡上每個數字都有出處欄位，改了要留版本與理由。</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ② 模組庫 ============ -->
+<section id="t-lib" hidden>
+  <p class="lead">模組庫＝<b>店型 × 城市等級</b>的卡片集合。點任一張卡，下方切換完整損益結構。這 6 張示範卡涵蓋台灣與大陸兩種幣別、四種店型——真實上線時以總部盤點的實際店型為準（Gate：涵蓋 ≥80% 現有店型才可公開）。</p>
+
+  <div class="filters">
+    <span class="note" style="margin-right:4px">幣別</span>
+    <button class="chip" data-f="cur" data-v="all" aria-pressed="true">全部</button>
+    <button class="chip" data-f="cur" data-v="NT$" aria-pressed="false">新台幣</button>
+    <button class="chip" data-f="cur" data-v="RMB" aria-pressed="false">人民幣</button>
+    <span class="note" style="margin:0 4px 0 14px">排序</span>
+    <button class="chip" data-f="sort" data-v="pay" aria-pressed="true">回收期最短</button>
+    <button class="chip" data-f="sort" data-v="margin" aria-pressed="false">淨利率最高</button>
+    <button class="chip" data-f="sort" data-v="inv" aria-pressed="false">投資額最低</button>
+  </div>
+
+  <div class="libgrid" id="libgrid"></div>
+
+  <h2 class="sec">選定卡片：完整損益結構</h2>
+  <div class="grid" style="grid-template-columns:minmax(300px,1fr) minmax(300px,1.15fr)">
+    <div class="panel"><h3 style="font-size:14px;margin-bottom:10px">開辦投資明細</h3><div id="invTbl"></div></div>
+    <div class="panel"><h3 style="font-size:14px;margin-bottom:10px">月損益結構（基準情境）</h3><div id="plTbl"></div></div>
+  </div>
+  <p class="note" style="margin-top:12px">※ 六張卡的差異結論（示範）：一線城市旗艦店營收最高，但租金＋商場抽成佔 22.6%，<b style="color:var(--ink)">淨利率反而最低、回收期最長</b>；複合型（身體＋頭皮）因客單價高，回收期最短。這種「反直覺但有數字」的結論，正是模組庫要替加盟主先講出來的。</p>
+</section>
+
+<!-- ============ ③ 試算 ============ -->
+<section id="t-calc" hidden>
+  <p class="lead">加盟主拿到卡之後最想做的事：<b>把自己談到的租金、自己估的來客填進去</b>。拉動滑桿即時重算——這是模組卡數位化後才有的功能，紙本做不到。注意：系統<b>只算，不承諾</b>；結果頁固定顯示損益兩平來客數，讓對方看到風險而不只是看到獲利。</p>
+
+  <div class="calcwrap">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div><div class="note">試算基準卡</div><b id="calcName" style="font-size:15px"></b></div>
+        <button class="btn sm" id="reset">重設回卡片值</button>
+      </div>
+      <div id="sliders"></div>
+    </div>
+
+    <div>
+      <div class="scen" id="scen"></div>
+      <div class="panel">
+        <h3 style="font-size:14px;margin-bottom:10px">月損益瀑布（依你調整後的參數）</h3>
+        <div class="waterfall" id="wf"></div>
+        <div class="beflag" id="beflag"></div>
+      </div>
+      <p class="note" style="margin-top:12px">※ 折舊以裝修＋設備 5 年直線攤提計入；保證金視為可退回，不計入回收期分母。總部管理費依現行制度固定計入，不隨營收浮動。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ④ 校準 ============ -->
+<section id="t-cal" hidden>
+  <p class="lead">模組卡最容易變成畫餅的地方，就是<b>做完第一版就不動了</b>。機制設計是：每季由財務用去識別的群體實際統計回頭校準，卡片升版、差異公開、理由留檔。下面是同一張卡從 v1.0 到 v2.0 的真實樣態——<b>校準後回收期變長了，卡照樣要發</b>。</p>
+
+  <div class="timeline">
+    <div class="tl done"><div class="q">2026 Q4</div><div class="n">v1.0 首版</div><div class="d">以現有店型建卡，樣本 41 店</div></div>
+    <div class="tl done"><div class="q">2027 Q1</div><div class="n">內審 · 不公開</div><div class="d">格式定稿、NDA 與說明書</div></div>
+    <div class="tl done"><div class="q">2027 Q2</div><div class="n">v2.0 首次校準</div><div class="d">樣本 47 店，2 項假設偏離 &gt;10%</div></div>
+    <div class="tl"><div class="q">2027 Q3</div><div class="n">v2.1</div><div class="d">共銷團首檔成效納入行銷率</div></div>
+    <div class="tl"><div class="q">2027 Q4</div><div class="n">v3.0 · 2028 規劃</div><div class="d">滿意度調查與使用回饋</div></div>
+  </div>
+
+  <h2 class="sec">v1.0 → v2.0 差異表（卡片 <span id="calCode"></span>）</h2>
+  <div class="panel">
+    <table class="diff" id="diffTbl"></table>
+  </div>
+
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(290px,1fr));margin-top:14px">
+    <div class="panel">
+      <h4 style="font-size:14px;margin-bottom:6px">AI 在校準會議前做的事 <span class="tag a">自動</span></h4>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.9">
+        <li>彙整 47 店去識別統計，算出各項假設的群體中位數與四分位距</li>
+        <li>比對卡片現值，<b>標記偏離 &gt;10% 的項目</b>（本季：租金、來客數）</li>
+        <li>產出「偏離說明待填表」，指名該項目的負責單位</li>
+      </ul>
+    </div>
+    <div class="panel" style="border-color:var(--accent);box-shadow:0 0 0 2px var(--accent2)">
+      <h4 style="font-size:14px;margin-bottom:6px">校準會議上人做的事 <span class="tag o">人審 · 不可自動化</span></h4>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.9">
+        <li>判斷偏離是「市場結構改變」還是「樣本雜訊」——只有前者改卡</li>
+        <li>決定改假設或改適用範圍（本季決議：一線城市另立高租金子卡）</li>
+        <li>財務主管簽核後才發版；未簽核版本不得外流</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note" style="margin-top:12px">※ 若某季偏離幅度大到卡片可信度受質疑（Stop 條件），機制是<b>暫停公開該卡並重核統計方法</b>，不是硬改數字讓它好看。</p>
+</section>
+
+<!-- ============ ⑤ AI ============ -->
+<section id="t-ai" hidden>
+  <p class="lead">回答「模組卡能不能數位化、能不能 AI」——<b>能，但要切三段</b>。AI 負責重複勞動與偵錯，人負責定調與簽字，第三段是明文禁區。禁區不是保守，是因為一旦 AI 自動核定或自動承諾，模組卡的可信度會在第一次出錯時歸零。</p>
+
+  <div class="three">
+    <div class="zone ai">
+      <h4>AI 做（自動，但輸出是草稿）</h4>
+      <ul>
+        <li>各店 CSV／POS 匯總去識別、清洗異常值</li>
+        <li>算群體中位數、四分位距、季變動</li>
+        <li><b>假設偏離標記</b>（&gt;10% 亮燈並排序）</li>
+        <li>模組卡改版草稿與差異說明初稿</li>
+        <li>加盟主問答（只引用已發版卡片，附版本號）</li>
+        <li>繁簡與幣別換算、卡片多語版本</li>
+        <li>商圈重疊的地理標記（給區域委員會看）</li>
+      </ul>
+    </div>
+    <div class="zone hu">
+      <h4>人做（AI 不得代勞）</h4>
+      <ul>
+        <li>判斷偏離該不該改卡、改假設還是改範圍</li>
+        <li>核定每一個對外數字並簽核發版</li>
+        <li>主持每季校準會議、留下決議理由</li>
+        <li>核發區域保護證、仲裁商圈重疊爭議</li>
+        <li>對加盟主的正式承諾與合約條款</li>
+      </ul>
+    </div>
+    <div class="zone no">
+      <h4>明文禁止</h4>
+      <ul>
+        <li>AI 自動改定價、自動改卡片數字</li>
+        <li>AI 自動核定區域授權或加盟資格</li>
+        <li>公開單店／單區可識別數據</li>
+        <li>對加盟主做任何獲利保證或投報承諾</li>
+        <li>AI 自動生成對外行銷文案直接發布</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="sec">數位化後多出來的那一個功能：問答（示意）</h2>
+  <div class="qbtns" id="qbtns"></div>
+  <div class="chat" id="chat"></div>
+  <p class="note" style="margin-top:10px">※ 問答只從<b>已發版</b>的模組卡取數，一律附卡號與版本；遇到沒有卡的城市，正確行為是說「沒有卡」並轉人工，而不是推估一個數字。</p>
+</section>
+
+<!-- ============ ⑥ 流程 ============ -->
+<section id="t-flow" hidden>
+  <p class="lead">一張卡不是寫出來的，是<b>從各店真實營運資料長出來的</b>。這條線上有兩個人審閘門，缺一個，卡就退回草稿狀態、不得公開。</p>
+
+  <div class="flow">
+    <div class="fstep"><div class="no">STEP 01</div><h4>各店資料上傳</h4><p>月結財報／POS 匯出 CSV，欄位由總部統一定義（營收、來客、客單、租金、人事、材料）。</p></div>
+    <div class="fstep"><div class="no">STEP 02</div><h4>去識別彙整</h4><p>移除店名店號，僅保留店型／城市等級／開店年資。樣本 &lt; 3 店的分群不出卡。</p></div>
+    <div class="fstep"><div class="no">STEP 03</div><h4>AI 統計與偏離標記</h4><p>算群體中位數與四分位距，比對現行卡片值，偏離 &gt;10% 亮燈，產出改版草稿。</p><span class="badge tag a">AI</span></div>
+    <div class="fstep human"><div class="no">STEP 04</div><h4>季度校準會議</h4><p>財務主持，逐項判斷偏離原因，決議改／不改／改範圍，留存理由。</p><span class="badge tag o">人審閘門</span></div>
+    <div class="fstep human"><div class="no">STEP 05</div><h4>財務簽核發版</h4><p>簽核後才生成 vN 卡片，同步發布差異表與資料期間。</p><span class="badge tag o">人審閘門</span></div>
+    <div class="fstep"><div class="no">STEP 06</div><h4>對外查閱</h4><p>加盟主／經銷商簽 NDA 後於平台查閱、試算、下載 PDF；查閱行為留紀錄。</p></div>
+  </div>
+  <div class="loopback">↺ <b>回饋迴路：</b>加盟主在試算頁填入的自有參數（租金、來客）在<b>經同意且去識別</b>的前提下回流成下一季的樣本，讓卡片愈用愈準。未同意者不納入，且不影響其查閱權限。</div>
+
+  <h2 class="sec">數位化要動的系統（不必大改 ERP）</h2>
+  <div class="stack">
+    <div class="srow"><div class="sl">資料層</div><div class="sd">現行 ERP／POS <b>維持不動</b>，只增加一支月結匯出（CSV）。模組庫是側車系統，不寫回 ERP。</div></div>
+    <div class="srow"><div class="sl">計算層</div><div class="sd">參數化損益模型（本樣張已實作）：一組公式 × 每張卡一組參數，改參數就改卡，不需改程式。</div></div>
+    <div class="srow"><div class="sl">發布層</div><div class="sd">版本控制與簽核紀錄：每版留存資料期間、樣本數、簽核人、差異表，供日後查證。</div></div>
+    <div class="srow"><div class="sl">存取層</div><div class="sd">NDA 綁帳號、查閱留痕、卡片 PDF 加浮水印（含查閱人與版本），外流可溯源。</div></div>
+  </div>
+</section>
+
+<!-- ============ ⑦ 要動用什麼 ============ -->
+<section id="t-build" hidden>
+  <p class="lead">從這份樣張到 2027 Q2 對外公開，需要的<b>不是一套新系統，是一組人與一份紀律</b>。以下為落地清單與 Gate 條件。</p>
+
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div class="panel">
+      <h3 style="font-size:14px;margin-bottom:8px">總部要先給的三樣東西</h3>
+      <table>
+        <tr><td>① 店型與城市等級的分群定義</td><td style="width:96px"><span class="tag w">未定</span></td></tr>
+        <tr><td>② 各店月結資料的欄位標準與回收機制</td><td><span class="tag w">未定</span></td></tr>
+        <tr><td style="border-bottom:0">③ 財務端每季 1 次校準會議的固定時段</td><td style="border-bottom:0"><span class="tag w">未定</span></td></tr>
+      </table>
+      <p class="note" style="margin-top:10px">三樣缺一，模組庫只能是靜態文件，不會是活的工具。</p>
+    </div>
+    <div class="panel">
+      <h3 style="font-size:14px;margin-bottom:8px">Gate 與停損（沿用提案 A）</h3>
+      <table>
+        <tr><td>Q1 Pass</td><td>模組卡涵蓋現有真實店型 ≥80%</td></tr>
+        <tr><td>Q2 Pass</td><td>公開＋說明會，NDA 簽署率 ≥90%</td></tr>
+        <tr><td>Q3 Pass</td><td>v2 校準完成，偏離項目均有書面理由</td></tr>
+        <tr><td>Revise</td><td>偏離過大 → 修正假設與適用範圍</td></tr>
+        <tr><td style="border-bottom:0">Stop</td><td style="border-bottom:0">數字可信度受質疑 → 暫停公開、重核統計方法</td></tr>
+      </table>
+    </div>
+    <div class="panel">
+      <h3 style="font-size:14px;margin-bottom:8px">KPI（提案目標，基線 2026 Q4 建立）</h3>
+      <table>
+        <tr><td>模組卡更新頻率</td><td class="n">每季 1 版</td></tr>
+        <tr><td>涵蓋店型比率</td><td class="n">≥80%</td></tr>
+        <tr><td>用模組卡完成加盟決策比率</td><td class="n">≥60%</td></tr>
+        <tr><td>經銷商滿意度</td><td class="n">≥85%</td></tr>
+        <tr><td style="border-bottom:0">卡片維護預算（假設值）</td><td class="n" style="border-bottom:0">15 萬／年</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h2 class="sec">三個待總經理裁示的決策點</h2>
+  <div class="stack">
+    <div class="srow"><div class="sl">決策一</div><div class="sd"><b>公開到什麼程度？</b>只給已簽約加盟主／經銷商，還是招商階段的潛在夥伴也能看（簽 NDA）。本樣張假設為後者——透明度是這案的價值來源。</div></div>
+    <div class="srow"><div class="sl">決策二</div><div class="sd"><b>加盟金與管理費的顯示方式。</b>紅線是金額不動（加盟金 60 萬／管理費 25,000 元每月，<span class="tag w">數字待核定，內部檔案有 60／28／24 萬三種版本</span>），但要決定是否在卡上明示——不明示，卡就不完整。</div></div>
+    <div class="srow"><div class="sl">決策三</div><div class="sd"><b>大陸城市卡的幣別與樣本來源。</b>台灣卡可用現有店樣本；大陸各城市等級是否已有 ≥3 店樣本，決定 2027 Q2 能公開幾張卡。</div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  區域獲利模組卡 · 功能樣張｜海欣大中華 2027 年度方針三 · 提案 A ｜ 本樣張所有數字為<b>格式示範用假設值</b>，非核定數字、非任何形式之獲利承諾。<br>
+  真實卡片須以總部財務盤點之去識別群體統計為準，經財務簽核後發版。
+</footer>
+
+<script>
+/* ─────────── 模型：一組公式 × 每張卡一組參數 ─────────── */
+function calc(p){
+  const rev = p.visits * p.ticket;
+  const bonus = rev * p.bonusRate;
+  const material = rev * p.materialRate;
+  const mkt = rev * p.mktRate;
+  const dep = (p.deco + p.equip) / 60;
+  const cost = p.rent + p.staff + bonus + material + p.mgmtFee + mkt + p.misc + dep;
+  const profit = rev - cost;
+  return {rev,bonus,material,mkt,dep,cost,profit,margin: rev? profit/rev : 0,
+    items:[
+      {k:'租金',v:p.rent},{k:'人事底薪',v:p.staff},{k:'業績獎金',v:bonus},
+      {k:'材料成本',v:material},{k:'總部管理費',v:p.mgmtFee},{k:'行銷費',v:mkt},
+      {k:'水電雜支',v:p.misc},{k:'折舊攤提',v:dep}
+    ]};
+}
+function investTotal(c){return Object.values(c.invest).reduce((a,b)=>a+b,0)}
+function investNet(c){return investTotal(c) - (c.invest['保證金']||0)}
+function payback(c,p){const r=calc(p); return r.profit>0 ? investNet(c)/r.profit : Infinity}
+function breakEven(p){
+  const varRate = p.bonusRate + p.materialRate + p.mktRate;
+  const fixed = p.rent + p.staff + p.mgmtFee + p.misc + (p.deco+p.equip)/60;
+  return fixed / (p.ticket * (1 - varRate));
+}
+
+/* ─────────── 六張示範卡 ─────────── */
+const CARDS = [
+{code:'M-TW-01', name:'社區型 30 坪', type:'社區型', cityTier:'台灣 · 二級商圈', cityEg:'台中北屯／台南東區／高雄鳳山',
+ cur:'NT$', area:30, sample:11, rooms:3, hc:'店長 1 · 美療師 3 · 櫃檯 1', band:'1,800 – 4,800',
+ invest:{'加盟金':600000,'裝修工程':1050000,'設備儀器':450000,'首批貨':250000,'保證金':150000,'開辦其他':120000},
+ p:{visits:260,ticket:2800,rent:85000,staff:206000,bonusRate:.08,materialRate:.18,mgmtFee:25000,mktRate:.03,misc:35000,deco:1050000,equip:450000}},
+
+{code:'M-TW-02', name:'複合型 45 坪（身體＋頭皮）', type:'複合型', cityTier:'台灣 · 二級商圈', cityEg:'新竹竹北／桃園中壢',
+ cur:'NT$', area:45, sample:5, rooms:5, hc:'店長 1 · 美療師 5 · 櫃檯 1', band:'2,200 – 6,800',
+ invest:{'加盟金':600000,'裝修工程':1575000,'設備儀器':750000,'首批貨':350000,'保證金':200000,'開辦其他':150000},
+ p:{visits:340,ticket:3200,rent:120000,staff:286000,bonusRate:.08,materialRate:.19,mgmtFee:25000,mktRate:.03,misc:45000,deco:1575000,equip:750000}},
+
+{code:'M-CN-03', name:'社區型 100 ㎡', type:'社區型', cityTier:'大陸 · 新一線', cityEg:'成都／杭州／西安',
+ cur:'RMB', area:100, sample:6, rooms:3, hc:'店長 1 · 美療師 3 · 櫃檯 1', band:'380 – 980',
+ invest:{'加盟金':140000,'裝修工程':200000,'設備儀器':100000,'首批貨':60000,'保證金':40000,'開辦其他':30000},
+ p:{visits:300,ticket:580,rent:26000,staff:52000,bonusRate:.08,materialRate:.18,mgmtFee:6000,mktRate:.03,misc:9000,deco:200000,equip:100000}},
+
+{code:'M-CN-04', name:'商圈標準 165 ㎡', type:'商圈標準', cityTier:'大陸 · 新一線', cityEg:'成都／武漢／南京',
+ cur:'RMB', area:165, sample:5, rooms:5, hc:'店長 1 · 美療師 5 · 櫃檯 2', band:'480 – 1,280',
+ invest:{'加盟金':140000,'裝修工程':363000,'設備儀器':180000,'首批貨':90000,'保證金':70000,'開辦其他':45000},
+ p:{visits:480,ticket:680,rent:52000,staff:96000,bonusRate:.08,materialRate:.17,mgmtFee:6000,mktRate:.035,misc:15000,deco:363000,equip:180000}},
+
+{code:'M-CN-05', name:'商圈標準 165 ㎡', type:'商圈標準', cityTier:'大陸 · 一線', cityEg:'上海／北京／深圳',
+ cur:'RMB', area:165, sample:4, rooms:5, hc:'店長 1 · 美療師 6 · 櫃檯 2', band:'680 – 1,880',
+ invest:{'加盟金':140000,'裝修工程':462000,'設備儀器':200000,'首批貨':100000,'保證金':120000,'開辦其他':60000},
+ p:{visits:520,ticket:880,rent:96000,staff:138000,bonusRate:.08,materialRate:.17,mgmtFee:6000,mktRate:.035,misc:20000,deco:462000,equip:200000},
+ v2:{visits:470,ticket:920,rent:108000,staff:138000,bonusRate:.08,materialRate:.162,mgmtFee:6000,mktRate:.04,misc:20000,deco:462000,equip:200000}},
+
+{code:'M-CN-06', name:'購物中心旗艦 264 ㎡', type:'旗艦型', cityTier:'大陸 · 一線', cityEg:'上海／深圳 購物中心',
+ cur:'RMB', area:264, sample:3, rooms:8, hc:'店長 1 · 副店 1 · 美療師 9 · 櫃檯 2', band:'880 – 2,680',
+ invest:{'加盟金':140000,'裝修工程':844800,'設備儀器':320000,'首批貨':150000,'保證金':200000,'開辦其他':90000},
+ p:{visits:760,ticket:980,rent:168000,staff:246000,bonusRate:.08,materialRate:.16,mgmtFee:6000,mktRate:.04,misc:32000,deco:844800,equip:320000}}
+];
+
+/* ─────────── 工具 ─────────── */
+const money=(n,cur)=> (cur||'')+Math.round(n).toLocaleString('en-US');
+const wan=(n,cur)=>{ if(cur==='NT$') return (n/10000).toFixed(1)+' 萬'; return (n/10000).toFixed(1)+' 萬'; };
+const pct=n=>(n*100).toFixed(1)+'%';
+
+/* ─────────── ① 卡面 ─────────── */
+let faceBack=false;
+const FACE = CARDS[4]; // M-CN-05 一線標準店
+function renderFace(){
+  const c=FACE, r=calc(c.p), lo=calc({...c.p,visits:c.p.visits*.85}),
+        hi=calc({...c.p,visits:c.p.visits*1.15,ticket:c.p.ticket*1.05});
+  const el=document.getElementById('cardFace');
+  if(!faceBack){
+    el.innerHTML=`
+    <div class="hd">
+      <div><div class="t1">區域獲利模組卡 · 正面</div><h3>${c.name}</h3>
+        <div style="font-size:12px;opacity:.85;margin-top:2px">${c.cityTier}｜${c.cityEg}</div></div>
+      <div class="code">${c.code}<br>v2.0 · 2027Q2<br>樣本 ${c.sample} 店</div>
+    </div>
+    <div class="body">
+      <div class="kpi3">
+        <div><div class="k">開辦總投資</div><div class="v">${wan(investTotal(c))}</div><div class="u">${c.cur}（含可退保證金）</div></div>
+        <div><div class="k">月淨利區間</div><div class="v">${(lo.profit/10000).toFixed(1)}–${(hi.profit/10000).toFixed(1)}</div><div class="u">${c.cur} 萬／月（保守–樂觀）</div></div>
+        <div><div class="k">靜態回收期</div><div class="v">${payback(c,c.p).toFixed(0)}</div><div class="u">個月（基準情境）</div></div>
+      </div>
+      <div class="blocklabel">基準情境 月損益</div>
+      <div class="rowline"><span class="l">月營收</span><span class="r">${money(r.rev,c.cur)}</span></div>
+      <div class="rowline"><span class="l">月總成本</span><span class="r">${money(r.cost,c.cur)}</span></div>
+      <div class="rowline"><span class="l"><b>月淨利／淨利率</b></span><span class="r"><b>${money(r.profit,c.cur)}　${pct(r.margin)}</b></span></div>
+      <div class="rowline"><span class="l">損益兩平來客數</span><span class="r">${Math.ceil(breakEven(c.p))} 人次／月</span></div>
+      <div class="blocklabel">店型規格</div>
+      <div class="rowline"><span class="l">面積／房數</span><span class="r">${c.area} ㎡ · ${c.rooms} 房</span></div>
+      <div class="rowline"><span class="l">人力配置</span><span class="r">${c.hc}</span></div>
+      <div class="rowline"><span class="l">建議客單區間</span><span class="r">${c.cur} ${c.band}</span></div>
+      <div class="disclaim">本卡為<b>群體統計推導之區間</b>，非個別門店之獲利承諾。實際結果受商圈、租約、經營能力影響。資料期間 2027Q1，樣本 ${c.sample} 店（去識別）。</div>
+    </div>`;
+  }else{
+    const rows=[
+      ['月來客數',c.p.visits+' 人次','各店來客中位數',''],
+      ['平均客單價',c.cur+' '+c.p.ticket.toLocaleString(),'實收客單中位數',''],
+      ['月租金',money(c.p.rent,c.cur)+'（佔營收 '+pct(c.p.rent/r.rev)+'）','近 12 個月新簽租約','⚠ 本季偏離 +12.5%'],
+      ['人事底薪',money(c.p.staff,c.cur),'人力配置 × 當地薪資帶',''],
+      ['業績獎金率',pct(c.p.bonusRate),'現行獎金辦法',''],
+      ['材料成本率',pct(c.p.materialRate),'實際耗用／營收',''],
+      ['總部管理費',money(c.p.mgmtFee,c.cur)+'／月','現行制度（定額）','紅線 · 不變動'],
+      ['行銷費率',pct(c.p.mktRate),'含共銷團共購分攤',''],
+      ['水電雜支',money(c.p.misc,c.cur),'群體中位數',''],
+      ['折舊攤提',money(r.dep,c.cur),'裝修＋設備 ÷ 60 個月','會計政策']
+    ];
+    el.innerHTML=`
+    <div class="hd" style="background:var(--accent3)">
+      <div><div class="t1">區域獲利模組卡 · 背面</div><h3>假設條件與出處</h3>
+      <div style="font-size:12px;opacity:.85;margin-top:2px">數字可被質疑，才可能被相信</div></div>
+      <div class="code">${c.code}<br>v2.0 · 2027Q2</div>
+    </div>
+    <div class="body">
+      <table style="font-size:12.5px">
+        <thead><tr><th>假設項目</th><th>採用值</th><th>資料出處</th></tr></thead>
+        <tbody>${rows.map(x=>`<tr><td>${x[0]}${x[3]?`<br><span class="tag ${x[3][0]==='⚠'?'w':'a'}" style="margin-top:3px">${x[3]}</span>`:''}</td><td class="n">${x[1]}</td><td style="color:var(--muted)">${x[2]}</td></tr>`).join('')}</tbody>
+      </table>
+      <div class="blocklabel" style="margin-top:14px">情境設定</div>
+      <div class="rowline"><span class="l">保守</span><span class="r">來客 ×0.85（客單不變）　→ 月淨利 ${money(lo.profit,c.cur)}</span></div>
+      <div class="rowline" style="color:var(--warn)"><span class="l">　└ 讀法</span><span class="r">來客掉 15% 幾乎打平——此店型固定成本重，抗跌性低</span></div>
+      <div class="rowline"><span class="l">基準</span><span class="r">群體中位數　→ 月淨利 ${money(r.profit,c.cur)}</span></div>
+      <div class="rowline"><span class="l">樂觀</span><span class="r">來客 ×1.15、客單 ×1.05　→ 月淨利 ${money(hi.profit,c.cur)}</span></div>
+      <div class="disclaim">校準紀錄：v1.0（2026Q4，樣本 41 店）→ v2.0（2027Q2，樣本 47 店）。本版調整租金與來客兩項假設，理由見差異表。<br>財務簽核：＿＿＿＿＿　發版日：2027/04/15</div>
+    </div>`;
+  }
+}
+document.getElementById('flip').onclick=()=>{faceBack=!faceBack;renderFace();
+  document.getElementById('flip').textContent = faceBack? '翻面 ⇄ 看決策數字' : '翻面 ⇄ 看假設條件';};
+
+/* ─────────── ② 模組庫 ─────────── */
+let filt={cur:'all',sort:'pay'}, sel=CARDS[4].code;
+function renderLib(){
+  let list=CARDS.filter(c=>filt.cur==='all'||c.cur===filt.cur);
+  list.sort((a,b)=>{
+    if(filt.sort==='pay') return payback(a,a.p)-payback(b,b.p);
+    if(filt.sort==='margin') return calc(b.p).margin-calc(a.p).margin;
+    return investNet(a)-investNet(b);
+  });
+  const maxPay=Math.max(...CARDS.map(c=>payback(c,c.p)));
+  document.getElementById('libgrid').innerHTML=list.map(c=>{
+    const r=calc(c.p),pb=payback(c,c.p);
+    return `<div class="lib ${c.code===sel?'on':''}" data-c="${c.code}">
+      <div class="code">${c.code} · 樣本 ${c.sample} 店</div>
+      <h4>${c.name}</h4>
+      <div class="meta">${c.cityTier}｜投資 ${c.cur} ${wan(investTotal(c))}</div>
+      <div class="two">
+        <div><div class="k">月淨利率</div><div class="v">${pct(r.margin)}</div></div>
+        <div><div class="k">回收期</div><div class="v">${pb.toFixed(0)} <span style="font-size:11px;font-weight:400">月</span></div></div>
+      </div>
+      <div class="bar"><i style="width:${(pb/maxPay*100).toFixed(0)}%"></i></div>
+    </div>`;}).join('');
+  document.querySelectorAll('.lib').forEach(el=>el.onclick=()=>{sel=el.dataset.c;renderLib();renderDetail();});
+  renderDetail();
+}
+function renderDetail(){
+  const c=CARDS.find(x=>x.code===sel), r=calc(c.p);
+  document.getElementById('invTbl').innerHTML=`<table>
+    ${Object.entries(c.invest).map(([k,v])=>`<tr><td>${k}${k==='保證金'?' <span class="tag n">可退</span>':''}</td><td class="n">${money(v,c.cur)}</td></tr>`).join('')}
+    <tr class="total"><td>開辦總投資</td><td class="n">${money(investTotal(c),c.cur)}</td></tr>
+    <tr><td style="color:var(--muted);border-bottom:0">計入回收期之淨投資</td><td class="n" style="border-bottom:0">${money(investNet(c),c.cur)}</td></tr>
+  </table>`;
+  document.getElementById('plTbl').innerHTML=`<table>
+    <tr><td><b>月營收</b>（${c.p.visits} 人次 × ${money(c.p.ticket,c.cur)}）</td><td class="n"><b>${money(r.rev,c.cur)}</b></td><td class="n" style="color:var(--muted)">100%</td></tr>
+    ${r.items.map(i=>`<tr><td style="padding-left:20px;color:var(--muted)">${i.k}</td><td class="n">(${money(i.v,c.cur)})</td><td class="n" style="color:var(--muted)">${pct(i.v/r.rev)}</td></tr>`).join('')}
+    <tr class="total"><td>月淨利</td><td class="n">${money(r.profit,c.cur)}</td><td class="n">${pct(r.margin)}</td></tr>
+    <tr><td style="color:var(--muted);border-bottom:0">損益兩平來客數</td><td class="n" style="border-bottom:0" colspan="2">${Math.ceil(breakEven(c.p))} 人次／月（現況的 ${pct(breakEven(c.p)/c.p.visits)}）</td></tr>
+  </table>`;
+}
+document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+  const f=b.dataset.f; filt[f]=b.dataset.v;
+  document.querySelectorAll(`.chip[data-f="${f}"]`).forEach(x=>x.setAttribute('aria-pressed', x===b));
+  renderLib();
+});
+
+/* ─────────── ③ 試算 ─────────── */
+const CALC=CARDS[4]; let cp={...CALC.p};
+const SL=[
+  {k:'visits',label:'月來客數',min:200,max:800,step:10,unit:' 人次'},
+  {k:'ticket',label:'平均客單價',min:400,max:1600,step:20,unit:'',cur:1},
+  {k:'rent',label:'月租金',min:40000,max:180000,step:2000,unit:'',cur:1},
+  {k:'staff',label:'人事底薪合計',min:80000,max:220000,step:2000,unit:'',cur:1},
+  {k:'materialRate',label:'材料成本率',min:.10,max:.26,step:.005,unit:'',rate:1},
+  {k:'mktRate',label:'行銷費率',min:0,max:.08,step:.005,unit:'',rate:1}
+];
+function renderSliders(){
+  document.getElementById('calcName').textContent=`${CALC.code}　${CALC.name}　${CALC.cityTier}`;
+  document.getElementById('sliders').innerHTML=SL.map(s=>{
+    const v=cp[s.k];
+    return `<div class="slider"><div class="lab"><span>${s.label}</span><b id="v-${s.k}">${s.rate?pct(v):(s.cur?money(v,CALC.cur):v+s.unit)}</b></div>
+    <input type="range" data-k="${s.k}" min="${s.min}" max="${s.max}" step="${s.step}" value="${v}"></div>`;}).join('');
+  document.querySelectorAll('#sliders input').forEach(i=>i.oninput=()=>{
+    cp[i.dataset.k]=parseFloat(i.value); renderCalc();
+  });
+}
+function renderCalc(){
+  SL.forEach(s=>{const e=document.getElementById('v-'+s.k); if(e) e.textContent=s.rate?pct(cp[s.k]):(s.cur?money(cp[s.k],CALC.cur):cp[s.k]+s.unit);});
+  const base=calc(cp),
+    lo=calc({...cp,visits:cp.visits*.85}),
+    hi=calc({...cp,visits:cp.visits*1.15,ticket:cp.ticket*1.05});
+  const pb=p=>p>0? (investNet(CALC)/p).toFixed(0)+' 個月':'無法回收';
+  document.getElementById('scen').innerHTML=`
+   <div><div class="k">保守（來客 ×0.85）</div><div class="v">${(lo.profit/10000).toFixed(1)}</div><div class="u">萬／月 · ${pb(lo.profit)}</div></div>
+   <div class="mid"><div class="k">你設定的基準</div><div class="v">${(base.profit/10000).toFixed(1)}</div><div class="u">萬／月 · ${pb(base.profit)}</div></div>
+   <div><div class="k">樂觀（×1.15／×1.05）</div><div class="v">${(hi.profit/10000).toFixed(1)}</div><div class="u">萬／月 · ${pb(hi.profit)}</div></div>`;
+  const max=base.rev||1;
+  const rows=[{k:'月營收',v:base.rev,cls:'rev'}].concat(base.items.map(i=>({k:i.k,v:i.v,cls:''})))
+    .concat([{k:'月淨利',v:base.profit,cls:'prof'}]);
+  document.getElementById('wf').innerHTML=rows.map(r=>
+    `<div class="wf ${r.cls}"><div class="wl">${r.k}</div><div class="wb"><i style="width:${Math.max(0,Math.min(100,r.v/max*100))}%"></i></div><div class="wv">${money(r.v,CALC.cur)}</div></div>`).join('');
+  const be=breakEven(cp), ratio=be/cp.visits;
+  document.getElementById('beflag').innerHTML=
+    `<b>損益兩平來客數：${Math.ceil(be)} 人次／月</b>　（＝你設定來客的 ${pct(ratio)}）<br>
+     <span style="color:var(--muted);font-size:12.5px">意思是：來客掉到 ${Math.ceil(be)} 人次以下就開始虧損。淨利率 ${pct(base.margin)}${base.margin<0.1?'，低於群體中位數，建議重新檢視租金條件。':'。'}
+     系統只呈現計算結果，不對個別門店做任何獲利承諾。</span>`;
+}
+document.getElementById('reset').onclick=()=>{cp={...CALC.p};renderSliders();renderCalc();};
+
+/* ─────────── ④ 校準 ─────────── */
+function renderDiff(){
+  const c=CARDS[4]; document.getElementById('calCode').textContent=c.code+'　'+c.name+'　'+c.cityTier;
+  const v1=c.p, v2=c.v2, r1=calc(v1), r2=calc(v2);
+  const rows=[
+    ['月來客數', v1.visits+' 人次', v2.visits+' 人次', (v2.visits-v1.visits)/v1.visits, '一線城市新店密度提高，單店來客回落', true],
+    ['平均客單價', money(v1.ticket,c.cur), money(v2.ticket,c.cur), (v2.ticket-v1.ticket)/v1.ticket, '高單價療程佔比上升', false],
+    ['月租金', money(v1.rent,c.cur), money(v2.rent,c.cur), (v2.rent-v1.rent)/v1.rent, '近 12 個月新簽租約平均上漲', true],
+    ['材料成本率', pct(v1.materialRate), pct(v2.materialRate), (v2.materialRate-v1.materialRate)/v1.materialRate, '集中採購議價改善', false],
+    ['行銷費率', pct(v1.mktRate), pct(v2.mktRate), (v2.mktRate-v1.mktRate)/v1.mktRate, '共銷團共購分攤納入', false]
+  ];
+  const flag=x=>Math.abs(x)>0.10 ? '<span class="tag w">AI 標記 · 偏離 &gt;10%</span>' : '<span class="tag n">在容許帶內</span>';
+  document.getElementById('diffTbl').innerHTML=`
+   <thead><tr><th>假設項目</th><th class="n">v1.0（2026Q4 · 41 店）</th><th class="n">v2.0（2027Q2 · 47 店）</th><th class="n">變動</th><th>校準理由（人審填寫）</th><th>系統標記</th></tr></thead>
+   <tbody>
+   ${rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td class="n">${r[2]}</td>
+     <td class="n ${r[3]>0?(r[5]?'up':'dn'):(r[5]?'dn':'up')}">${r[3]>0?'+':''}${(r[3]*100).toFixed(1)}%</td>
+     <td style="color:var(--muted);font-size:12.5px">${r[4]}</td><td>${flag(r[3])}</td></tr>`).join('')}
+   <tr class="total"><td>月淨利</td><td class="n">${money(r1.profit,c.cur)}</td><td class="n">${money(r2.profit,c.cur)}</td>
+     <td class="n ${r2.profit<r1.profit?'up':'dn'}">${((r2.profit-r1.profit)/r1.profit*100).toFixed(1)}%</td>
+     <td colspan="2" style="font-weight:400;color:var(--muted);font-size:12.5px">校準後淨利率 ${pct(r1.margin)} → ${pct(r2.margin)}</td></tr>
+   <tr class="total"><td>靜態回收期</td><td class="n">${payback(c,v1).toFixed(1)} 個月</td><td class="n">${payback(c,v2).toFixed(1)} 個月</td>
+     <td class="n up">+${(payback(c,v2)-payback(c,v1)).toFixed(1)} 月</td>
+     <td colspan="2" style="font-weight:400;color:var(--bad);font-size:12.5px">數字變差也要照發——這是模組庫可信度的來源</td></tr>
+   </tbody>`;
+}
+
+/* ─────────── ⑤ AI 問答示意 ─────────── */
+const QA=[
+ {q:'我在成都想開 165 ㎡，房東開價月租 5.8 萬人民幣，這樣划算嗎？',
+  a:'以 <b>M-CN-04（商圈標準 165 ㎡ · 新一線）v2.0</b> 的基準假設試算，你的租金 ¥58,000 高於群體中位數 ¥52,000（+11.5%）。在其他假設不變下，月淨利由 ¥55,326 降至 ¥49,326，淨利率 17.0% → 15.1%，靜態回收期由 14.8 個月延長至 16.6 個月，仍在該卡的保守區間內。<br><br>建議把這組參數存為你的試算版本，並在簽租約前與加盟營運確認商圈重疊狀態。',
+  c:'引用：M-CN-04 v2.0（資料期間 2027Q1，樣本 5 店，去識別）。本回覆為試算結果，非獲利承諾。'},
+ {q:'我看重慶，你們有卡嗎？',
+  a:'目前<b>沒有重慶適用的模組卡</b>。重慶目前門店樣本數為 2 店，未達出卡門檻（≥3 店），系統不會用其他城市的數據推估給你——那會給你一個看起來精確但沒有依據的數字。<br><br>可行做法：① 參考 M-CN-04（新一線）作為<b>範圍參考</b>，但請注意租金與客單須另行查證；② 已為你建立需求紀錄，加盟營運將於 5 個工作日內與你聯繫。',
+  c:'查無適用卡片。已轉人工：加盟營運部 · 案號 REQ-2027-0412。'},
+ {q:'你們保證多久回本？',
+  a:'<b>不保證。</b>模組卡提供的是群體統計推導的區間，不是對個別門店的承諾。實際結果受商圈條件、租約、人員穩定度與經營投入影響，卡片上的「靜態回收期」是在特定假設全部成立時的計算值。<br><br>能提供的是：完整的假設條件（背面全部公開）、每季用實際群體數據校準的紀錄、以及保守情境下的數字——保守情境正是為了讓你先看到最差狀況。',
+  c:'依模組庫使用規範：AI 不得做任何獲利保證或投報承諾。'}
+];
+function renderChat(i){
+  document.getElementById('chat').innerHTML=`
+   <div class="msg u"><div class="who">加盟主</div><div class="bub">${QA[i].q}</div></div>
+   <div class="msg a"><div class="who">模組庫問答 · 依已發版卡片作答</div><div class="bub">${QA[i].a}<div class="cite">${QA[i].c}</div></div></div>`;
+  document.querySelectorAll('#qbtns .btn').forEach((b,j)=>b.classList.toggle('pri',j===i));
+}
+document.getElementById('qbtns').innerHTML=QA.map((q,i)=>`<button class="btn sm" data-i="${i}">${['試算問題','沒有卡的城市','要求保證'][i]}</button>`).join('');
+document.querySelectorAll('#qbtns .btn').forEach(b=>b.onclick=()=>renderChat(+b.dataset.i));
+
+/* ─────────── tabs ─────────── */
+const TABS=['card','lib','calc','cal','ai','flow','build'];
+function show(t){
+  if(!TABS.includes(t)) t='card';
+  TABS.forEach(x=>document.getElementById('t-'+x).hidden = x!==t);
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.t===t));
+  if(location.hash.slice(2)!==t) history.replaceState(null,'','#/'+t);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>show(b.dataset.t));
+
+renderFace(); renderLib(); renderSliders(); renderCalc(); renderDiff(); renderChat(0);
+show(location.hash.slice(2)||'card');
+
+/* ─────────── 通行碼門（僅為避免誤入，非資訊安全機制） ─────────── */
+(function(){
+  var PW='Haixin2027', K='mc-gate-ok';
+  var g=document.getElementById('gate');
+  function open_(){ g.remove(); document.body.classList.remove('locked'); }
+  if(sessionStorage.getItem(K)==='1'){ open_(); return; }
+  document.body.classList.add('locked');
+  function tryPw(){
+    var v=document.getElementById('gpw').value.trim();
+    if(v===PW){ sessionStorage.setItem(K,'1'); open_(); }
+    else { document.getElementById('gerr').textContent='通行碼不正確'; document.getElementById('gpw').select(); }
+  }
+  document.getElementById('gbtn').onclick=tryPw;
+  document.getElementById('gpw').onkeydown=function(e){ if(e.key==='Enter') tryPw(); };
+  setTimeout(function(){document.getElementById('gpw').focus();},60);
+})();
+
+</script>
+</body>
+</html>
