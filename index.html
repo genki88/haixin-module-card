@@ -201,36 +201,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   @page{size:A4;margin:12mm}
 }
 
-/* ── 通行碼門 ── */
-#gate{position:fixed;inset:0;z-index:999;background:var(--paper);display:grid;place-items:center;padding:24px}
-#gate .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:34px 34px 30px;max-width:400px;width:100%;
-  box-shadow:0 20px 50px -34px rgba(0,0,0,.55)}
-#gate .mk{width:40px;height:40px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;margin-bottom:16px}
-#gate h2{font-size:18px;margin-bottom:4px}
-#gate p{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 18px}
-#gate input{width:100%;font:inherit;font-size:15px;padding:10px 13px;border:1px solid var(--line2);border-radius:8px;background:#FCFBF9;color:var(--ink)}
-#gate input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent2)}
-#gate .err{color:var(--bad);font-size:12.5px;margin-top:8px;min-height:18px}
-#gate .btn{width:100%;margin-top:6px;padding:11px}
-#gate .foot{font-size:11.5px;color:var(--faint);margin-top:16px;line-height:1.7;border-top:1px solid var(--line);padding-top:12px}
-body.locked{overflow:hidden}
+
 footer{max-width:1240px;margin:0 auto;padding:0 28px 60px;color:var(--faint);font-size:12px;line-height:1.8}
 </style>
 </head>
 <body>
 
-
-<div id="gate">
-  <div class="box">
-    <div class="mk">模</div>
-    <h2>區域獲利模組卡 · 功能樣張</h2>
-    <p>海欣大中華 2027 年度方針三｜提案 A<br>內部審閱用，請輸入通行碼。</p>
-    <input id="gpw" type="password" placeholder="通行碼" autocomplete="off">
-    <div class="err" id="gerr"></div>
-    <button class="btn pri" id="gbtn">進入</button>
-    <div class="foot">本樣張所有數字為<b>格式示範用假設值</b>，非核定數字、非任何形式之獲利承諾。請勿外傳。</div>
-  </div>
-</div>
 
 <header class="top">
   <div class="top-in">
@@ -777,22 +753,7 @@ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>show(b.datase
 renderFace(); renderLib(); renderSliders(); renderCalc(); renderDiff(); renderChat(0);
 show(location.hash.slice(2)||'card');
 
-/* ─────────── 通行碼門（僅為避免誤入，非資訊安全機制） ─────────── */
-(function(){
-  var PW='Haixin2027', K='mc-gate-ok';
-  var g=document.getElementById('gate');
-  function open_(){ g.remove(); document.body.classList.remove('locked'); }
-  if(sessionStorage.getItem(K)==='1'){ open_(); return; }
-  document.body.classList.add('locked');
-  function tryPw(){
-    var v=document.getElementById('gpw').value.trim();
-    if(v===PW){ sessionStorage.setItem(K,'1'); open_(); }
-    else { document.getElementById('gerr').textContent='通行碼不正確'; document.getElementById('gpw').select(); }
-  }
-  document.getElementById('gbtn').onclick=tryPw;
-  document.getElementById('gpw').onkeydown=function(e){ if(e.key==='Enter') tryPw(); };
-  setTimeout(function(){document.getElementById('gpw').focus();},60);
-})();
+
 
 </script>
 </body>
